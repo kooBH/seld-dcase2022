@@ -28,20 +28,24 @@ def main(argv):
 
     print('\nLoading the best model and predicting results on the testing split')
     print('\tLoading testing dataset:')
+    print(".")
     data_gen_test = cls_data_generator.DataGenerator(
-        params=params, split=1, shuffle=False, is_eval=True if params['mode']=='eval' else False
+        #params=params, split=1, shuffle=False, is_eval=True if params['mode']=='eval' else False
+        params=params, split=4, shuffle=False, is_eval=True if params['mode']=='eval' else False
     )
+    print("0")
     data_in, data_out = data_gen_test.get_data_sizes()
     dump_figures = True
 
     # CHOOSE THE MODEL WHOSE OUTPUT YOU WANT TO VISUALIZE 
-    checkpoint_name = "models/1_1_foa_dev_split6_model.h5"
+    #checkpoint_name = "models/1_1_foa_dev_split6_model.h5"
+    checkpoint_name = "/home/data/kbh/DCASE2022/base/model/12_1_dev_split0_multiaccdoa_mic_salsa_model.h5"
     model = seldnet_model.CRNN(data_in, data_out, params)
     model.eval()
     model.load_state_dict(torch.load(checkpoint_name, map_location=torch.device('cpu')))
     model = model.to(device)
     if dump_figures:
-        dump_folder = os.path.join('dump_dir', os.path.basename(checkpoint_name).split('.')[0])
+        dump_folder = os.path.join('.', os.path.basename(checkpoint_name).split('.')[0])
         os.makedirs(dump_folder, exist_ok=True)
 
     with torch.no_grad():
@@ -52,6 +56,9 @@ def main(argv):
 
             # (batch, sequence, max_nb_doas*3) to (batch, sequence, 3, max_nb_doas)
             max_nb_doas = output.shape[2]//3
+            print('=========')
+            print(output.shape)
+            print(target.shape)
             output = output.view(output.shape[0], output.shape[1], 3, max_nb_doas).transpose(-1, -2)
             target = target.view(target.shape[0], target.shape[1], 3, max_nb_doas).transpose(-1, -2)
 

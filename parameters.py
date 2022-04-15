@@ -11,18 +11,18 @@ def get_params(argv='1'):
         quick_test=True,     # To do quick test. Trains/test on small subset of dataset, and # of epochs
     
         finetune_mode = False,  # Finetune on existing model, requires the pretrained model path set - pretrained_model_weights
-        pretrained_model_weights = 'models/1_1_foa_dev_split6_model.h5', 
+        pretrained_model_weights = '/home/data/kbh/DCASE2022/base/model/12_1_dev_split0_multiaccdoa_mic_salsa_model.h5', 
 
         # INPUT PATH
         # dataset_dir='DCASE2020_SELD_dataset/',  # Base folder containing the foa/mic and metadata folders
-        dataset_dir = '/scratch/asignal/partha/DCASE2022_SELD_dataset',
+        dataset_dir = '/home/data/kbh/DCASE2022_SELD_dataset/',
 
         # OUTPUT PATHS
         # feat_label_dir='DCASE2020_SELD_dataset/feat_label_hnet/',  # Directory to dump extracted features and labels
-        feat_label_dir='/scratch/asignal/partha/DCASE2022_SELD_dataset/seld_feat_label',
+        feat_label_dir='/home/data/kbh/DCASE2022/base/feat',
  
-        model_dir='models/',            # Dumps the trained models and training curves in this folder
-        dcase_output_dir='results/',    # recording-wise results are dumped in this path.
+        model_dir='/home/data/kbh/DCASE2022/base/model/',            # Dumps the trained models and training curves in this folder
+        dcase_output_dir='/home/data/kbh/DCASE2022/base/result/',    # recording-wise results are dumped in this path.
 
         # DATASET LOADING PARAMETERS
         mode='dev',         # 'dev' - development or 'eval' - evaluation dataset
@@ -32,7 +32,9 @@ def get_params(argv='1'):
         fs=24000,
         hop_len_s=0.02,
         label_hop_len_s=0.1,
+        # default : 60
         max_audio_len_s=60,
+        # default : 64
         nb_mel_bins=64,
 
         use_salsalite = False, # Used for MIC dataset only. If true use salsalite features, else use GCC features
@@ -46,7 +48,8 @@ def get_params(argv='1'):
 
         # DNN MODEL PARAMETERS
         label_sequence_length=50,    # Feature sequence length
-        batch_size=128,              # Batch size
+        # default : 128
+        batch_size=64,              # Batch size
         dropout_rate=0.05,             # Dropout rate, constant for all layers
         nb_cnn2d_filt=64,           # Number of CNN nodes, constant for each layer
         f_pool_size=[4, 4, 2],      # CNN frequency pooling, length of list = number of CNN layers, list value = pooling per layer
@@ -146,8 +149,9 @@ def get_params(argv='1'):
         params['dataset'] = 'mic'
         params['use_salsalite'] = True
         params['multi_accdoa'] = True
-        params['nb_cnn2d_filt']=256
-        params['nb_rnn_layers']=2
+        params['quick_test'] = False
+        #params['nb_cnn2d_filt']=256
+        #params['nb_rnn_layers']=2
     elif argv == '999':
         print("QUICK TEST MODE\n")
         params['quick_test'] = True
