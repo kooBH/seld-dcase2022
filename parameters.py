@@ -4,9 +4,10 @@
 # the code below (if-else loop) and use them. This way you can easily reproduce a configuration on a later time.
 
 
-def get_params(argv='1'):
+def get_params(argv='3'):
     print("SET: {}".format(argv))
     # ########### default parameters ##############
+    version = "6"
     params = dict(
         quick_test=True,     # To do quick test. Trains/test on small subset of dataset, and # of epochs
     
@@ -18,11 +19,11 @@ def get_params(argv='1'):
         dataset_dir = '/home/data/kbh/DCASE2022_SELD_dataset/',
 
         # OUTPUT PATHS
-        # feat_label_dir='DCASE2020_SELD_dataset/feat_label_hnet/',  # Directory to dump extracted features and labels
-        feat_label_dir='/home/data/kbh/DCASE2022/base/feat',
+        # feat_label_dir="DCASE2020_SELD_dataset/feat_label_hnet/",  # Directory to dump extracted features and labels
+        feat_label_dir="/home/data/kbh/DCASE2022/"+version+"/feat",
  
-        model_dir='/home/data/kbh/DCASE2022/base/model/',            # Dumps the trained models and training curves in this folder
-        dcase_output_dir='/home/data/kbh/DCASE2022/base/result/',    # recording-wise results are dumped in this path.
+        model_dir="/home/data/kbh/DCASE2022/"+version+"/model/",            # Dumps the trained models and training curves in this folder
+        dcase_output_dir="/home/data/kbh/DCASE2022/"+version+"/result/",    # recording-wise results are dumped in this path.
 
         # DATASET LOADING PARAMETERS
         mode='dev',         # 'dev' - development or 'eval' - evaluation dataset
@@ -63,7 +64,7 @@ def get_params(argv='1'):
         nb_fnn_layers=1,
         fnn_size=128,             # FNN contents, length of list = number of layers, list value = number of nodes
 
-        nb_epochs=100,              # Train for maximum epochs
+        nb_epochs=300,              # Train for maximum epochs
         lr=1e-3,
 
         # METRIC
@@ -152,6 +153,14 @@ def get_params(argv='1'):
         params['quick_test'] = False
         #params['nb_cnn2d_filt']=256
         #params['nb_rnn_layers']=2
+    elif argv == '13':
+        print("FOA + SALSA + multi ACCDOA\n")
+        params['quick_test'] = False
+        params['dataset'] = 'foa'
+        params['multi_accdoa'] = True
+        params['use_salsalite'] = True
+        params['nb_cnn2d_filt']=128
+        params['nb_rnn_layers']=2
     elif argv == '999':
         print("QUICK TEST MODE\n")
         params['quick_test'] = True

@@ -60,6 +60,8 @@ def main(argv):
             print(output.shape)
             print(target.shape)
             output = output.view(output.shape[0], output.shape[1], 3, max_nb_doas).transpose(-1, -2)
+            import pdb
+            pdb.set_trace()
             target = target.view(target.shape[0], target.shape[1], 3, max_nb_doas).transpose(-1, -2)
 
             # get pair-wise distance matrix between predicted and reference.
