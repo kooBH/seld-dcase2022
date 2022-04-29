@@ -27,7 +27,7 @@ def get_params(argv='3'):
         dcase_output_dir="/home/data/kbh/DCASE_output/"+version+"/result/",    # recording-wise results are dumped in this path.
 
         # DATASET LOADING PARAMETERS
-        mode='dev',         # 'dev' - development or 'eval' - evaluation dataset
+        mode='train',         # 'dev' - development or 'eval' - evaluation dataset
         dataset='foa',       # 'foa' - ambisonic or 'mic' - microphone signals
 
         #FEATURE PARAMS
@@ -65,7 +65,7 @@ def get_params(argv='3'):
         nb_fnn_layers=1,
         fnn_size=128,             # FNN contents, length of list = number of layers, list value = number of nodes
 
-        nb_epochs=300,              # Train for maximum epochs
+        nb_epochs=100,              # Train for maximum epochs
         lr=1e-3,
 
         # METRIC

@@ -240,6 +240,12 @@ def main(argv):
         else:
             print('ERROR: Unknown dataset splits')
             exit()
+    elif params['mode'] == 'train' : 
+        test_splits = [[4]]
+        val_splits = [[4]]
+        train_splits = [[1, 2, 3]] 
+
+
     for split_cnt, split in enumerate(test_splits):
         print('\n\n---------------------------------------------------------------------------------------------------')
         print('------------------------------------      SPLIT {}   -----------------------------------------------'.format(split))

@@ -77,7 +77,11 @@ class DataGenerator(object):
     def _get_filenames_list_and_feat_label_sizes(self):
         print('Computing some stats about the dataset')
         max_frames, total_frames, temp_feat = -1, 0, []
+
+
         for filename in os.listdir(self._feat_dir):
+            # if int(filename[4]) in self._splits: 
+            #print("_get_filenames_list_and_feat_label_sizes :: {} | {}".format(filename,self._splits))
             if int(filename[4]) in self._splits: # check which split the file belongs to
                 self._filenames_list.append(filename)
                     
@@ -90,7 +94,7 @@ class DataGenerator(object):
             self._nb_frames_file = max_frames if self._per_file else temp_feat.shape[0]
             self._nb_ch = temp_feat.shape[1] // self._nb_mel_bins
         else:
-            print('Loading features failed')
+            print('ERROR::clc_Data_generator::Loading features failed : len(temp_feat) != 0 | {} | {}'.format(len(temp_feat),self._feat_dir))
             exit()
 
         if not self._is_eval:

@@ -7,10 +7,13 @@ import numpy as np
 
 class ComputeSELDResults(object):
     def __init__(
-            self, params, ref_files_folder=None, use_polar_format=True
+            self, params, ref_files_folder=None, use_polar_format=True, synth=True
     ):
         self._use_polar_format = use_polar_format
-        self._desc_dir = ref_files_folder if ref_files_folder is not None else os.path.join(params['dataset_dir'], 'metadata_dev')
+        if synth : 
+            self._desc_dir = ref_files_folder if ref_files_folder is not None else os.path.join(params['dataset_dir'], 'metadata')
+        else :
+            self._desc_dir = ref_files_folder if ref_files_folder is not None else os.path.join(params['dataset_dir'], 'metadata_dev')
         self._doa_thresh = params['lad_doa_thresh']
 
         # Load feature class
@@ -18,14 +21,23 @@ class ComputeSELDResults(object):
         
         # collect reference files
         self._ref_labels = {}
-        for split in os.listdir(self._desc_dir):      
-            for ref_file in os.listdir(os.path.join(self._desc_dir, split)):
+        if synth :
+            for ref_file in os.listdir(os.path.join(self._desc_dir)):
                 # Load reference description file
-                gt_dict = self._feat_cls.load_output_format_file(os.path.join(self._desc_dir, split, ref_file))
+                gt_dict = self._feat_cls.load_output_format_file(os.path.join(self._desc_dir, ref_file))
                 if not self._use_polar_format:
                     gt_dict = self._feat_cls.convert_output_format_polar_to_cartesian(gt_dict)
                 nb_ref_frames = max(list(gt_dict.keys()))
                 self._ref_labels[ref_file] = [self._feat_cls.segment_labels(gt_dict, nb_ref_frames), nb_ref_frames]
+        else :
+            for split in os.listdir(self._desc_dir):      
+                for ref_file in os.listdir(os.path.join(self._desc_dir, split)):
+                    # Load reference description file
+                    gt_dict = self._feat_cls.load_output_format_file(os.path.join(self._desc_dir, split, ref_file))
+                    if not self._use_polar_format:
+                        gt_dict = self._feat_cls.convert_output_format_polar_to_cartesian(gt_dict)
+                    nb_ref_frames = max(list(gt_dict.keys()))
+                    self._ref_labels[ref_file] = [self._feat_cls.segment_labels(gt_dict, nb_ref_frames), nb_ref_frames]
 
         self._nb_ref_files = len(self._ref_labels)
         self._average = params['average']

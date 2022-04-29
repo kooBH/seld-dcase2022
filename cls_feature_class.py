@@ -21,7 +21,7 @@ def nCr(n, r):
 
 
 class FeatureClass:
-    def __init__(self, params, is_eval=False,synth=False):
+    def __init__(self, params, is_eval=False,synth=True):
         """
 
         :param params: parameters dictionary
