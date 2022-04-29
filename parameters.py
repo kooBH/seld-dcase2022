@@ -7,7 +7,7 @@
 def get_params(argv='3'):
     print("SET: {}".format(argv))
     # ########### default parameters ##############
-    version = "6"
+    version = "3"
     params = dict(
         quick_test=True,     # To do quick test. Trains/test on small subset of dataset, and # of epochs
     
@@ -16,14 +16,15 @@ def get_params(argv='3'):
 
         # INPUT PATH
         # dataset_dir='DCASE2020_SELD_dataset/',  # Base folder containing the foa/mic and metadata folders
-        dataset_dir = '/home/data/kbh/DCASE2022_SELD_dataset/',
+        #dataset_dir = '/home/data/kbh/DCASE2022_SELD_dataset/',
+        dataset_dir = '/home/data/kbh/DCASE2022_SELD_synth_data/',
 
         # OUTPUT PATHS
         # feat_label_dir="DCASE2020_SELD_dataset/feat_label_hnet/",  # Directory to dump extracted features and labels
-        feat_label_dir="/home/data/kbh/DCASE2022/"+version+"/feat",
+        feat_label_dir="/home/data/kbh/DCASE_output/"+version+"/feat",
  
-        model_dir="/home/data/kbh/DCASE2022/"+version+"/model/",            # Dumps the trained models and training curves in this folder
-        dcase_output_dir="/home/data/kbh/DCASE2022/"+version+"/result/",    # recording-wise results are dumped in this path.
+        model_dir="/home/data/kbh/DCASE_output/"+version+"/model/",            # Dumps the trained models and training curves in this folder
+        dcase_output_dir="/home/data/kbh/DCASE_output/"+version+"/result/",    # recording-wise results are dumped in this path.
 
         # DATASET LOADING PARAMETERS
         mode='dev',         # 'dev' - development or 'eval' - evaluation dataset
@@ -71,6 +72,9 @@ def get_params(argv='3'):
         average = 'macro',        # Supports 'micro': sample-wise average and 'macro': class-wise average
         lad_doa_thresh=20
     )
+
+    # Fixed n_class
+    params['unique_classes'] = 13
 
     # ########### User defined parameters ##############
     if argv == '1':

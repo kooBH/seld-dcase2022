@@ -21,7 +21,7 @@ def nCr(n, r):
 
 
 class FeatureClass:
-    def __init__(self, params, is_eval=False):
+    def __init__(self, params, is_eval=False,synth=False):
         """
 
         :param params: parameters dictionary
@@ -31,10 +31,20 @@ class FeatureClass:
         # Input directories
         self._feat_label_dir = params['feat_label_dir']
         self._dataset_dir = params['dataset_dir']
-        self._dataset_combination = '{}_{}'.format(params['dataset'], 'eval' if is_eval else 'dev')
-        self._aud_dir = os.path.join(self._dataset_dir, self._dataset_combination)
+        self.synth = synth
 
-        self._desc_dir = None if is_eval else os.path.join(self._dataset_dir, 'metadata_dev')
+        print("FeatureClass::synth : {}".format(self.synth))
+
+        if synth :
+            self._aud_dir = os.path.join(self._dataset_dir,'foa')
+            self._dataset_combination = "foa_synth"
+            self._desc_dir = os.path.join(self._dataset_dir, 'metadata')
+        else :
+            self._dataset_combination = '{}_{}'.format(params['dataset'], 'eval' if is_eval else 'dev')
+
+            self._aud_dir = os.path.join(self._dataset_dir, self._dataset_combination)
+
+            self._desc_dir = None if is_eval else os.path.join(self._dataset_dir, 'metadata_dev')
 
         # Output directories
         self._label_dir = None
@@ -96,8 +106,8 @@ class FeatureClass:
         print('Computing frame stats:')
         print('\t\taud_dir {}\n\t\tdesc_dir {}\n\t\tfeat_dir {}'.format(
             self._aud_dir, self._desc_dir, self._feat_dir))
-        for sub_folder in os.listdir(self._aud_dir):
-            loc_aud_folder = os.path.join(self._aud_dir, sub_folder)
+        if self.synth : 
+            loc_aud_folder = self._aud_dir
             for file_cnt, file_name in enumerate(os.listdir(loc_aud_folder)):
                 wav_filename = '{}.wav'.format(file_name.split('.')[0])
                 with contextlib.closing(wave.open(os.path.join(loc_aud_folder, wav_filename),'r')) as f: 
@@ -105,7 +115,18 @@ class FeatureClass:
                 nb_feat_frames = int(audio_len / float(self._hop_len))
                 nb_label_frames = int(audio_len / float(self._label_hop_len))
                 self._filewise_frames[file_name.split('.')[0]] = [nb_feat_frames, nb_label_frames]
-        return
+            return
+        else : 
+            for sub_folder in os.listdir(self._aud_dir):
+                loc_aud_folder = os.path.join(self._aud_dir, sub_folder)
+                for file_cnt, file_name in enumerate(os.listdir(loc_aud_folder)):
+                    wav_filename = '{}.wav'.format(file_name.split('.')[0])
+                    with contextlib.closing(wave.open(os.path.join(loc_aud_folder, wav_filename),'r')) as f: 
+                        audio_len = f.getnframes()
+                    nb_feat_frames = int(audio_len / float(self._hop_len))
+                    nb_label_frames = int(audio_len / float(self._label_hop_len))
+                    self._filewise_frames[file_name.split('.')[0]] = [nb_feat_frames, nb_label_frames]
+            return
 
     def _load_audio(self, audio_path):
         fs, audio = wav.read(audio_path)
@@ -371,14 +392,24 @@ class FeatureClass:
         print('\t\taud_dir {}\n\t\tdesc_dir {}\n\t\tfeat_dir {}'.format(
             self._aud_dir, self._desc_dir, self._feat_dir))
         arg_list = []
-        for sub_folder in os.listdir(self._aud_dir):
-            loc_aud_folder = os.path.join(self._aud_dir, sub_folder)
+        if self.synth : 
+            loc_aud_folder = os.path.join(self._aud_dir)
             for file_cnt, file_name in enumerate(os.listdir(loc_aud_folder)):
                 wav_filename = '{}.wav'.format(file_name.split('.')[0])
                 wav_path = os.path.join(loc_aud_folder, wav_filename)
                 feat_path = os.path.join(self._feat_dir, '{}.npy'.format(wav_filename.split('.')[0]))
                 self.extract_file_feature((file_cnt, wav_path, feat_path))
                 arg_list.append((file_cnt, wav_path, feat_path))
+        else : 
+            for sub_folder in os.listdir(self._aud_dir):
+                loc_aud_folder = os.path.join(self._aud_dir, sub_folder)
+                for file_cnt, file_name in enumerate(os.listdir(loc_aud_folder)):
+                    wav_filename = '{}.wav'.format(file_name.split('.')[0])
+                    wav_path = os.path.join(loc_aud_folder, wav_filename)
+                    feat_path = os.path.join(self._feat_dir, '{}.npy'.format(wav_filename.split('.')[0]))
+                    self.extract_file_feature((file_cnt, wav_path, feat_path))
+                    arg_list.append((file_cnt, wav_path, feat_path))
+
 #        with Pool() as pool:
 #            result = pool.map(self.extract_file_feature, iterable=arg_list)
 #            pool.close()
@@ -437,8 +468,8 @@ class FeatureClass:
         print('\t\taud_dir {}\n\t\tdesc_dir {}\n\t\tlabel_dir {}'.format(
             self._aud_dir, self._desc_dir, self._label_dir))
         create_folder(self._label_dir)
-        for sub_folder in os.listdir(self._desc_dir):
-            loc_desc_folder = os.path.join(self._desc_dir, sub_folder)
+        if self.synth : 
+            loc_desc_folder = os.path.join(self._desc_dir)
             for file_cnt, file_name in enumerate(os.listdir(loc_desc_folder)):
                 wav_filename = '{}.wav'.format(file_name.split('.')[0])
                 nb_label_frames = self._filewise_frames[file_name.split('.')[0]][1]
@@ -450,6 +481,20 @@ class FeatureClass:
                     label_mat = self.get_labels_for_file(desc_file, nb_label_frames)
                 print('{}: {}, {}'.format(file_cnt, file_name, label_mat.shape))
                 np.save(os.path.join(self._label_dir, '{}.npy'.format(wav_filename.split('.')[0])), label_mat)
+        else : 
+            for sub_folder in os.listdir(self._desc_dir):
+                loc_desc_folder = os.path.join(self._desc_dir, sub_folder)
+                for file_cnt, file_name in enumerate(os.listdir(loc_desc_folder)):
+                    wav_filename = '{}.wav'.format(file_name.split('.')[0])
+                    nb_label_frames = self._filewise_frames[file_name.split('.')[0]][1]
+                    desc_file_polar = self.load_output_format_file(os.path.join(loc_desc_folder, file_name))
+                    desc_file = self.convert_output_format_polar_to_cartesian(desc_file_polar)
+                    if self._multi_accdoa:
+                        label_mat = self.get_adpit_labels_for_file(desc_file, nb_label_frames)
+                    else:
+                        label_mat = self.get_labels_for_file(desc_file, nb_label_frames)
+                    print('{}: {}, {}'.format(file_cnt, file_name, label_mat.shape))
+                    np.save(os.path.join(self._label_dir, '{}.npy'.format(wav_filename.split('.')[0])), label_mat)
 
     # -------------------------------  DCASE OUTPUT  FORMAT FUNCTIONS -------------------------------
     def load_output_format_file(self, _output_format_file):
